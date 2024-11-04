@@ -7,6 +7,7 @@ import 'package:asocapp/app/apirest/api_models/api_models.dart';
 import 'package:asocapp/app/resources/resources.dart';
 import 'package:asocapp/app/utils/utils.dart';
 import 'package:asocapp/app/widgets/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class UserPage extends StatefulWidget {
@@ -29,16 +30,14 @@ class _UserPageState extends State<UserPage> {
     super.initState();
     // Use addPostFrameCallback for context-dependent initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      userItemController =
-          Provider.of<UserItemController>(context, listen: false);
+      userItemController = Provider.of<UserItemController>(context, listen: false);
       userItemController.isLogin(widget.user);
     });
   }
 
   @override
   void dispose() {
-    userItemController.userItem.value =
-        userItemController.userItemLast.value.clone();
+    userItemController.userItem.value = userItemController.userItemLast.value.clone();
     userItemController.onClose();
     super.dispose();
   }
@@ -74,8 +73,7 @@ class _UserPageState extends State<UserPage> {
                       )
                     : Form(
                         key: userItemController.formKey,
-                        autovalidateMode: AutovalidateMode
-                            .onUserInteraction, // Habilita la validación cuando el usuario interactúa con el formulario
+                        autovalidateMode: AutovalidateMode.onUserInteraction, // Habilita la validación cuando el usuario interactúa con el formulario
                         onChanged: () {},
                         child: _formUI(context, userItemController),
                       ),
@@ -101,8 +99,7 @@ class _UserPageState extends State<UserPage> {
             child: userItemController.userItem.value.avatarUser == ''
                 ? const ClipOval(
                     child: Image(
-                      image: AssetImage(
-                          'assets/images/icons_user_profile_circle.png'),
+                      image: AssetImage('assets/images/icons_user_profile_circle.png'),
                       //   fit: BoxFit.cover,
                       color: Colors.amberAccent,
                     ),
@@ -115,27 +112,21 @@ class _UserPageState extends State<UserPage> {
                   ),
           ),
           40.ph,
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            EglInputLabelText(label: "lAsociation".tr, fontSize: 14)
-          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [EglInputLabelText(label: "lAsociation".tr, fontSize: 14)]),
           3.ph,
           Text(
             userItemController.userItem.value.longNameAsociation,
             //   Utils.eglLogger('i', 'Asociation id: $onChangedVal');
           ),
           20.ph,
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            EglInputLabelText(label: "lUserName".tr, fontSize: 14)
-          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [EglInputLabelText(label: "lUserName".tr, fontSize: 14)]),
           3.ph,
           Text(
             userItemController.userItem.value.userNameUser,
             //   Utils.eglLogger('i', 'Asociation id: $onChangedVal');
           ),
           20.ph,
-          Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [EglInputLabelText(label: "lEmail".tr, fontSize: 14)]),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [EglInputLabelText(label: "lEmail".tr, fontSize: 14)]),
           3.ph,
           Text(
             userItemController.userItem.value.emailUser,
@@ -221,51 +212,35 @@ class _UserPageState extends State<UserPage> {
                     loading: userItemController.loading.value,
                     onPress: () async {
                       if (userItemController.formKey.currentState!.validate()) {
-                        if (userItemController.userItem.value.profileUser !=
-                                userItemController
-                                    .userItemLast.value.profileUser ||
-                            userItemController.userItem.value.statusUser !=
-                                userItemController
-                                    .userItemLast.value.statusUser) {
+                        if (userItemController.userItem.value.profileUser != userItemController.userItemLast.value.profileUser ||
+                            userItemController.userItem.value.statusUser != userItemController.userItemLast.value.statusUser) {
                           HttpResult<UserAsocResponse>? httpResult;
-                          httpResult =
-                              await userItemController.updateProfileStatus(
-                                  userItemController.userItem.value.idUser,
-                                  userItemController.userItem.value.profileUser,
-                                  userItemController.userItem.value.statusUser,
-                                  userItemController
-                                      .userItem.value.dateUpdatedUser);
+                          httpResult = await userItemController.updateProfileStatus(
+                              userItemController.userItem.value.idUser,
+                              userItemController.userItem.value.profileUser,
+                              userItemController.userItem.value.statusUser,
+                              userItemController.userItem.value.dateUpdatedUser);
 
                           if (httpResult!.statusCode == 200) {
                             if (httpResult.data != null) {
                               //   Utils.eglLogger('i', 'userapp: ${httpResult.data.toString()}');
-                              userItemController
-                                      .userItem.value.dateUpdatedUser =
-                                  httpResult
-                                      .data!.result!.dataUser.dateUpdatedUser;
-                              userItemController.userItemLast.value =
-                                  userItemController.userItem.value.copyWith();
+                              userItemController.userItem.value.dateUpdatedUser = httpResult.data!.result!.dataUser.dateUpdatedUser;
+                              userItemController.userItemLast.value = userItemController.userItem.value.copyWith();
                               userItemController.checkIsFormValid();
 
                               isOk = true;
-                              Navigator.pop(
-                                  context, 'User Updated'); // Pass a result
+                              context.pop(userItemController.userItem); // Pass a result
                               if (isOk) {}
                               //   navigator?.pop(userItemController.userItem.value);
                               return;
                             } else {
                               isOk = false;
 
-                              EglHelper.toastMessage(
-                                  httpResult.error.toString());
+                              EglHelper.toastMessage(httpResult.error.toString());
                               return;
                             }
                           } else if (httpResult.statusCode == 404) {
-                            EglHelper.popMessage(
-                                context,
-                                MessageType.info,
-                                '${'mUnexpectedError'.tr}.',
-                                '${'mNoScriptAvailable'.tr}.');
+                            EglHelper.popMessage(context, MessageType.info, '${'mUnexpectedError'.tr}.', '${'mNoScriptAvailable'.tr}.');
                             EglHelper.eglLogger('e', httpResult.error?.data);
                             isOk = false;
                             return;
@@ -280,18 +255,14 @@ class _UserPageState extends State<UserPage> {
                             return;
                           }
                         } else {
-                          EglHelper.popMessage(context, MessageType.info,
-                              'No han habido cambios', 'Nada para modificar');
+                          EglHelper.popMessage(context, MessageType.info, 'No han habido cambios', 'Nada para modificar');
                           isOk = false;
                           return;
                           // Utils.eglLogger('i', 'EglRoundButton: userConnected: ${userItemController.userItem.value}');
                         }
                       } else {
                         EglHelper.popMessage(
-                            context,
-                            MessageType.info,
-                            'Faltan campos por rellenar',
-                            'No se ha podido modificar el perfil del usuario');
+                            context, MessageType.info, 'Faltan campos por rellenar', 'No se ha podido modificar el perfil del usuario');
                         isOk = false;
                         return;
                       }

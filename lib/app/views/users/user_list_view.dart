@@ -1,9 +1,9 @@
 import 'package:asocapp/app/controllers/users/list_users_controller.dart';
 import 'package:asocapp/app/resources/resources.dart';
 import 'package:asocapp/app/utils/utils.dart';
-import 'package:asocapp/app/views/users/user_page.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../apirest/api_models/api_models.dart';
 
@@ -15,13 +15,13 @@ class UserListView extends StatefulWidget {
 }
 
 class _UserListViewState extends State<UserListView> {
-  ListUsersController listUsersController = Get.put(ListUsersController());
-
   List<dynamic> listUserStatus = UserStatus.getListUserStatus();
   List<dynamic> listUserProfiles = UserProfiles.getListUserProfiles();
 
   @override
   Widget build(BuildContext context) {
+    ListUsersController listUsersController = Provider.of<ListUsersController>(context);
+
     listUsersController.loading = false;
     return ListView.builder(
       itemCount: listUsersController.users.length,
@@ -37,7 +37,7 @@ class _UserListViewState extends State<UserListView> {
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
           child: GestureDetector(
             onTap: () async {
-              final resultado = await Get.to(() => UserPage(user: user));
+              final resultado = await context.pushNamed('user', extra: user) as UserItem; //Get.to(() => UserPage(user: user));
               // final resultado = await navigator?.push(MaterialPageRoute(builder: (contect) => UserPage(user: user)));
               if (resultado != null) {
                 user = resultado;

@@ -5,19 +5,23 @@ import 'package:asocapp/app/models/item_article_model.dart';
 import 'package:asocapp/app/services/services.dart';
 import 'package:asocapp/app/repositorys/articles_repository.dart';
 import 'package:asocapp/app/utils/utils.dart';
-import 'package:asocapp/app/views/auth/change/change_page.dart';
-import 'package:asocapp/app/views/auth/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 
 class ArticleController extends ChangeNotifier {
+  final BuildContext _context;
   final SessionService _session;
   final ArticlesRepository _articlesRepository;
 
   final EglTranslatorAiService _translator = EglTranslatorAiService();
 
-  ArticleController(this._session, this._articlesRepository) {
+  ArticleController(
+    this._context,
+    this._session,
+    this._articlesRepository,
+  ) {
     getArticles();
   }
 
@@ -38,14 +42,11 @@ class ArticleController extends ChangeNotifier {
   List<ArticleUser> get articlesPublicatedList => _articles
       .where((ArticleUser article) =>
           article.stateArticle == 'publicado' &&
-          (article.idAsociationArticle ==
-                  _session.userConnected?.idAsociationUser ||
-              article.idAsociationArticle == 999999999))
+          (article.idAsociationArticle == _session.userConnected.idAsociationUser || article.idAsociationArticle == 999999999))
       .toList();
   List<ArticleUser> get allArticlesList => _articles
-      .where((ArticleUser article) => (article.idAsociationArticle ==
-              _session.userConnected?.idAsociationUser ||
-          article.idAsociationArticle == 999999999))
+      .where((ArticleUser article) =>
+          (article.idAsociationArticle == _session.userConnected.idAsociationUser || article.idAsociationArticle == 999999999))
       .toList();
 
   ArticleUser _article = ArticleUser.clear(); // Artículo
@@ -70,24 +71,24 @@ class ArticleController extends ChangeNotifier {
   List<String> get titleArticleTr => _titleArticleTr;
   set titleArticleTr(value) => _titleArticleTr = value;
 
-  get languageUser => _session.userConnected?.languageUser;
+  get languageUser => _session.userConnected.languageUser;
 
   void isLogin() {
     if (_session.isLogin) {
       // Utils.eglLogger('e', 'ArticlesListView: init State isLogin');
-      if (_session.userConnected?.recoverPasswordUser != 0) {
-        Get.offAll(() => const ChangePage());
+      if (_session.userConnected.recoverPasswordUser != 0) {
+        _context.goNamed(('/change'));
+        Router.neglect(_context, () => _context.goNamed('change'));
       }
     } else {
-      Get.offAll(() => const LoginPage());
+      Router.neglect(_context, () => _context.goNamed('login'));
     }
   }
 
   Color getColorState(ArticleUser article) {
-    if (_session.userConnected?.profileUser == 'admin' &&
+    if (_session.userConnected.profileUser == 'admin' &&
         _session.checkEdit &&
-        _session.userConnected?.idAsociationUser ==
-            article.idAsociationArticle) {
+        _session.userConnected.idAsociationUser == article.idAsociationArticle) {
       switch (article.stateArticle) {
         case 'redacción':
           return EglColorsApp.workingColor;
@@ -107,21 +108,17 @@ class ArticleController extends ChangeNotifier {
   }
 
   Future<void> getArticles() async {
-    final ArticleListResponse articlesListResponse = await _articlesRepository
-        .getArticles(token: _session.userConnected!.tokenUser);
+    final ArticleListResponse articlesListResponse = await _articlesRepository.getArticles(token: _session.userConnected.tokenUser);
 
     _articles = [];
     // print('Response body: ${result}');
     if (articlesListResponse.status == 200) {
-      articlesListResponse.result
-          .map((article) => _articles.add(article))
-          .toList();
+      articlesListResponse.result.map((article) => _articles.add(article)).toList();
       // Ordenar la lista por el campo 'numOrder'
       _articles.sort((a, b) => a.numOrder.compareTo(b.numOrder));
       if (articlesListResponse.message == 'expired') {
         _session.isExpired = true;
-        _session
-            .setListUserMessages('Session expired. Reloggin for edit articles');
+        _session.setListUserMessages('Session expired. Reloggin for edit articles');
         _session.checkEdit = false;
       }
     } else {
@@ -135,10 +132,8 @@ class ArticleController extends ChangeNotifier {
     List<ArticleUser> list = [];
 
     for (final article in allArticlesList) {
-      if (_session.userConnected?.idAsociationUser ==
-              article.idAsociationArticle ||
-          (article.idAsociationArticle == 999999999 &&
-              article.stateArticle == 'publicado')) {
+      if (_session.userConnected.idAsociationUser == article.idAsociationArticle ||
+          (article.idAsociationArticle == 999999999 && article.stateArticle == 'publicado')) {
         list.add(article);
       }
     }
@@ -153,15 +148,12 @@ class ArticleController extends ChangeNotifier {
     List<ArticleUser> translatedArticles = [];
 
     await Future.wait(articlesPublicatedList.map((article) async {
-      String tra1 =
-          await _translator.translate(article.titleArticle, languageUser);
-      String tra2 =
-          await _translator.translate(article.abstractArticle, languageUser);
+      String tra1 = await _translator.translate(article.titleArticle, languageUser);
+      String tra2 = await _translator.translate(article.abstractArticle, languageUser);
 
       translatedArticles.add(article.copyWith(
         titleArticle: tra1.trim() == '' ? article.titleArticle : tra1.trim(),
-        abstractArticle:
-            tra2.trim() == '' ? article.abstractArticle : tra2.trim(),
+        abstractArticle: tra2.trim() == '' ? article.abstractArticle : tra2.trim(),
       ));
     }));
 
@@ -198,8 +190,7 @@ class ArticleController extends ChangeNotifier {
 
 // No se usa
   Future<ArticleUser> getArticle(ArticleUser article) async {
-    List<ItemArticle> list =
-        List.filled(article.itemsArticle.length, ItemArticle.clear());
+    List<ItemArticle> list = List.filled(article.itemsArticle.length, ItemArticle.clear());
 
     for (var i = 0; i < article.itemsArticle.length; i++) {
       String text = article.itemsArticle[i].textItemArticle.trim();
@@ -224,8 +215,7 @@ class ArticleController extends ChangeNotifier {
   }
 
   Future<ArticleUser> getSingleArticle(int idarticle) async {
-    final ArticleResponse articlesResponse = await _articlesRepository
-        .getSingleArticle(idarticle, token: _session.userConnected!.tokenUser);
+    final ArticleResponse articlesResponse = await _articlesRepository.getSingleArticle(idarticle, token: _session.userConnected.tokenUser);
 
     // print('Response body: ${result}');
     if (articlesResponse.status == 200) {
@@ -234,11 +224,9 @@ class ArticleController extends ChangeNotifier {
     return article;
   }
 
-  Future<HttpResult<BasicResponse>?> deleteArticle(
-      int idArticle, String dateUpdatedArticle) async {
+  Future<HttpResult<BasicResponse>?> deleteArticle(int idArticle, String dateUpdatedArticle) async {
     try {
-      return _articlesRepository.deleteArticle(idArticle, dateUpdatedArticle,
-          token: _session.userConnected!.tokenUser);
+      return _articlesRepository.deleteArticle(idArticle, dateUpdatedArticle, token: _session.userConnected.tokenUser);
     } catch (e) {
       EglHelper.toastMessage((e.toString()));
       return null;

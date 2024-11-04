@@ -12,7 +12,6 @@ import 'package:asocapp/app/services/services.dart';
 import 'package:asocapp/app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -25,10 +24,9 @@ class ArticleEditController extends ChangeNotifier {
     session = Provider.of<SessionService>(_context, listen: false);
 
     EglImagesPath.getAppIconUserDefault().then((value) {
-      _iconUserDefaultProfile.value = value;
-      _articleItemsCount.value = _newArticle.value.itemsArticle.length;
+      _iconUserDefaultProfile = value;
     }, onError: (error) {
-      _iconUserDefaultProfile.value = '';
+      _iconUserDefaultProfile = '';
     });
     // // Escucha cambios en selectedDatePublication
     // ever(selectedDatePublication, (DateTime date) {
@@ -38,131 +36,123 @@ class ArticleEditController extends ChangeNotifier {
 
   bool isNew = true;
 
-  final _oldArticle = Rx<Article>(Article.clear());
-  Article get oldArticle => _oldArticle.value;
-  set oldArticle(Article value) => _oldArticle.value = value;
+  Article _oldArticle = (Article.clear());
+  Article get oldArticle => _oldArticle;
+  set oldArticle(Article value) {
+    _oldArticle = value;
+    notifyListeners();
+  }
 
-  final _newArticle = Rx<Article>(Article.clear());
-  Article get newArticle => _newArticle.value;
-  set newArticle(Article value) => _newArticle.value = value;
+  Article _newArticle = Article.clear();
+  Article get newArticle => _newArticle;
+  set newArticle(Article value) {
+    _newArticle = value;
+    notifyListeners();
+  }
 
-  final _articleItemsCount = 0.obs;
-  int get articleItemsCount => _newArticle.value.itemsArticle.length;
-
-  // final _newArticleItems = Rx<List<ItemArticle>>([]);
-  // List<ItemArticle> get newArticleItems => _newArticleItems.value;
-  // set newArticleItems(List<ItemArticle> value) {
-  //   _newArticleItems.value = value;
-  //   _articleItemsCount.value = _newArticleItems.value.length;
-  // }
+  int get articleItemsCount => _newArticle.itemsArticle.length;
 
   set addItemArticle(ItemArticle value) {
-    // _newArticleItems.value.add(value);
-    _newArticle.value.itemsArticle.add(value);
-    // _newArticle.value.itemsArticle = _newArticleItems.value;
-    _articleItemsCount.value = _newArticle.value.itemsArticle.length;
-    _newArticle.refresh();
+    // _newArticleItems.add(value);
+    _newArticle.itemsArticle.add(value);
+    // _newArticle.itemsArticle = _newArticleItems;
+    notifyListeners();
   }
 
   void insertItemArticle(int index, ItemArticle item) {
-    // _newArticleItems.value.insert(index, item);
-    _newArticle.value.itemsArticle.insert(index, item);
-    _articleItemsCount.value = _newArticle.value.itemsArticle.length;
-    // _newArticle.value.itemsArticle = _newArticleItems.value;
-    _newArticle.refresh();
+    // _newArticleItems.insert(index, item);
+    _newArticle.itemsArticle.insert(index, item);
+    // _newArticle.itemsArticle = _newArticleItems;
+    notifyListeners();
   }
 
   ItemArticle deleteItemArticle(int value) {
-    // final ItemArticle item = _newArticleItems.value.removeAt(value);
-    final ItemArticle item = _newArticle.value.itemsArticle.removeAt(value);
-    _articleItemsCount.value = _newArticle.value.itemsArticle.length;
-    // _newArticle.value.itemsArticle = _newArticleItems.value;
-    _newArticle.refresh();
+    // final ItemArticle item = _newArticleItems.removeAt(value);
+    final ItemArticle item = _newArticle.itemsArticle.removeAt(value);
+    // _newArticle.itemsArticle = _newArticleItems;
+    notifyListeners();
     return item;
   }
 
   discardItemArticle(ItemArticle value) {
-    // _newArticleItems.value.removeWhere((item) => item.idItemArticle == value.idItemArticle);
-    _newArticle.value.itemsArticle
-        .removeWhere((item) => item.idItemArticle == value.idItemArticle);
-    _newArticle.refresh();
+    // _newArticleItems.removeWhere((item) => item.idItemArticle == value.idItemArticle);
+    _newArticle.itemsArticle.removeWhere((item) => item.idItemArticle == value.idItemArticle);
+    notifyListeners();
   }
 
   final passwordController = TextEditingController();
   final newPasswordController = TextEditingController();
 
-  Rx<DateTime> selectedDatePublication = DateTime.now().obs;
-  Rx<DateTime> firstDatePublication = DateTime.now().obs;
-  Rx<DateTime> lastDatePublication = DateTime(3000).obs;
-  Rx<String> textDatePublication = 'dd/mm/aaaa'.obs;
-  Rx<DateTime> selectedDateEffective = DateTime.now().obs;
-  Rx<DateTime> firstDateEffective = DateTime.now().obs;
-  Rx<DateTime> lastDateEffective = DateTime(3000).obs;
-  Rx<String> textDateEffective = 'dd/mm/aaaa'.obs;
-  Rx<DateTime> selectedDateExpiration = DateTime(4000).obs;
-  Rx<DateTime> firstDateExpiration = DateTime.now().obs;
-  Rx<DateTime> lastDateExpiration = DateTime(4001).obs;
-  Rx<String> textDateExpiration = 'dd/mm/aaaa'.obs;
+  DateTime selectedDatePublication = DateTime.now();
+  DateTime firstDatePublication = DateTime.now();
+  DateTime lastDatePublication = DateTime(3000);
+  String textDatePublication = 'dd/mm/aaaa';
+  DateTime selectedDateEffective = DateTime.now();
+  DateTime firstDateEffective = DateTime.now();
+  DateTime lastDateEffective = DateTime(3000);
+  String textDateEffective = 'dd/mm/aaaa';
+  DateTime selectedDateExpiration = DateTime(4000);
+  DateTime firstDateExpiration = DateTime.now();
+  DateTime lastDateExpiration = DateTime(4001);
+  String textDateExpiration = 'dd/mm/aaaa';
 
-  final _titleArticleFocusNode = FocusNode().obs;
-  FocusNode get titleArticleFocusNode => _titleArticleFocusNode.value;
+  final _titleArticleFocusNode = FocusNode();
+  FocusNode get titleArticleFocusNode => _titleArticleFocusNode;
 
-  final _abstractArticleFocusNode = FocusNode().obs;
-  FocusNode get abstractArticleFocusNode => _abstractArticleFocusNode.value;
+  final _abstractArticleFocusNode = FocusNode();
+  FocusNode get abstractArticleFocusNode => _abstractArticleFocusNode;
 
-  final _categoryFocusNode = FocusNode().obs;
-  FocusNode get categoryFocusNode => _categoryFocusNode.value;
+  final _categoryFocusNode = FocusNode();
+  FocusNode get categoryFocusNode => _categoryFocusNode;
 
-  final _subcategoryFocusNode = FocusNode().obs;
-  FocusNode get subcategoryFocusNode => _subcategoryFocusNode.value;
+  final _subcategoryFocusNode = FocusNode();
+  FocusNode get subcategoryFocusNode => _subcategoryFocusNode;
 
-  final _stateFocusNode = FocusNode().obs;
-  FocusNode get stateFocusNode => _stateFocusNode.value;
+  final _stateFocusNode = FocusNode();
+  FocusNode get stateFocusNode => _stateFocusNode;
 
   List<dynamic> listArticleCategory = ArticleCategory.getListArticleCategory();
-  List<dynamic> listArticleSubcategory =
-      ArticleSubcategory.getListArticleSubcategory();
+  List<dynamic> listArticleSubcategory = ArticleSubcategory.getListArticleSubcategory();
   List<dynamic> listArticleState = ArticleState.getListArticleState();
 
-  final _listSubcategory = Rx<List<dynamic>>([]);
-  List<dynamic> get listSubcategory => _listSubcategory.value;
+  List<dynamic> _listSubcategory = [];
+  List<dynamic> get listSubcategory => _listSubcategory;
   void actualizelistSubcategory(String value) {
-    _listSubcategory.value = [];
+    _listSubcategory = [];
 
     final List<dynamic> list = listArticleSubcategory
         .where((element) => element['category'].toString() == value)
         .map((e) => {'value': e['value'], 'name': e['name']})
         .toList();
 
-    _listSubcategory.value = list;
+    _listSubcategory = list;
   }
 
-  final _imageCoverChanged = false.obs;
-  bool get imageCoverChanged => _imageCoverChanged.value;
-  set imageCoverChanged(bool value) => _imageCoverChanged.value = value;
+  bool _imageCoverChanged = false;
+  bool get imageCoverChanged => _imageCoverChanged;
+  set imageCoverChanged(bool value) => _imageCoverChanged = value;
 
-  final _imageCover = Rx<XFile?>(XFile(''));
-  XFile? get imageCover => _imageCover.value;
-  set imageCover(XFile? value) => _imageCover.value = value;
+  XFile? _imageCover = (XFile(''));
+  XFile? get imageCover => _imageCover;
+  set imageCover(XFile? value) => _imageCover = value;
 
-  final _appLogo = ''.obs;
-  String get appLogo => _appLogo.value;
+  final _appLogo = '';
+  String get appLogo => _appLogo;
 
-  final _iconUserDefaultProfile = ''.obs;
-  String get iconUserDefaultProfile => _iconUserDefaultProfile.value;
-  set iconUserDefaultProfile(String value) =>
-      _iconUserDefaultProfile.value = value;
+  String _iconUserDefaultProfile = '';
+  String get iconUserDefaultProfile => _iconUserDefaultProfile;
+  set iconUserDefaultProfile(String value) => _iconUserDefaultProfile = value;
 
-  final _loading = false.obs;
-  bool get loading => _loading.value;
-  set loading(bool value) => _loading.value = value;
+  bool _loading = false;
+  bool get loading => _loading;
+  set loading(bool value) => _loading = value;
 
-  final _isFormValid = false.obs;
-  bool get isFormValid => _isFormValid.value;
-  set isFormValid(bool value) => _isFormValid.value = value;
+  bool _isFormValid = false;
+  bool get isFormValid => _isFormValid;
+  set isFormValid(bool value) => _isFormValid = value;
 
-  final _canSave = false.obs;
-  bool get canSave => _canSave.value;
+  bool _canSave = false;
+  bool get canSave => _canSave;
 
   bool titleOk = false;
   int minLengthTitle = 4;
@@ -172,53 +162,46 @@ class ArticleEditController extends ChangeNotifier {
   int maxLengthAbstract = 200;
 
   bool checkIsFormValid() {
-    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover.value!.path}');
-    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover.value!.path != ''}');
+    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover!.path}');
+    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover!.path != ''}');
     bool valid = checkFields();
-    _isFormValid.value = valid;
-    return _isFormValid.value;
+    _isFormValid = valid;
+    notifyListeners();
+    return _isFormValid;
   }
 
   bool checkFields() {
-    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover.value!.path}');
-    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover.value!.path != ''}');
-    bool valid = (titleOk &&
-        abstractOk &&
-        (_imageCoverChanged.value ||
-            !_newArticle.value.coverImageArticle.isDefault));
+    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover!.path}');
+    // Helper.eglLogger('i','checkIsFormValid: ${_imageCover!.path != ''}');
+    bool valid = (titleOk && abstractOk && (_imageCoverChanged || !_newArticle.coverImageArticle.isDefault));
 
-    if (valid && _newArticle.value.itemsArticle.isNotEmpty) {
-      valid = _newArticle.value.itemsArticle.every((ItemArticle item) {
-        bool value =
-            (item.textItemArticle != '' || !item.imageItemArticle.isDefault);
+    if (valid && _newArticle.itemsArticle.isNotEmpty) {
+      valid = _newArticle.itemsArticle.every((ItemArticle item) {
+        bool value = (item.textItemArticle != '' || !item.imageItemArticle.isDefault);
         return value;
       });
       // Llamar al método 'myMethod' dinámicamente
     }
 
-    _canSave.value = valid;
-    return _canSave.value;
+    _canSave = valid;
+    return _canSave;
   }
 
   void onClose() {
-    _titleArticleFocusNode.value.dispose();
-    _abstractArticleFocusNode.value.dispose();
-    _categoryFocusNode.value.dispose();
-    _subcategoryFocusNode.value.dispose();
-    _stateFocusNode.value.dispose();
+    _titleArticleFocusNode.dispose();
+    _abstractArticleFocusNode.dispose();
+    _categoryFocusNode.dispose();
+    _subcategoryFocusNode.dispose();
+    _stateFocusNode.dispose();
   }
 
   Future<HttpResult<ArticleUserResponse>?> createArticle(
-      BuildContext context,
-      ArticlePlain articlePlain,
-      ImageArticle imageCoverArticle,
-      List<ItemArticle> articleItems) async {
+      BuildContext context, ArticlePlain articlePlain, ImageArticle imageCoverArticle, List<ItemArticle> articleItems) async {
     loading = true;
 
     try {
       loading = false;
-      return articlesRepository.createArticle(articlePlain, imageCoverArticle,
-          articleItems, session.userConnected!);
+      return articlesRepository.createArticle(articlePlain, imageCoverArticle, articleItems, session.userConnected);
     } catch (e) {
       EglHelper.toastMessage((e.toString()));
       loading = false;
@@ -227,16 +210,12 @@ class ArticleEditController extends ChangeNotifier {
   }
 
   Future<HttpResult<ArticleUserResponse>?> modifyArticle(
-      BuildContext context,
-      ArticlePlain articlePlain,
-      ImageArticle imageCoverArticle,
-      List<ItemArticle> articleItems) async {
+      BuildContext context, ArticlePlain articlePlain, ImageArticle imageCoverArticle, List<ItemArticle> articleItems) async {
     loading = true;
 
     try {
       loading = false;
-      return articlesRepository.modifyArticle(articlePlain, imageCoverArticle,
-          articleItems, session.userConnected!);
+      return articlesRepository.modifyArticle(articlePlain, imageCoverArticle, articleItems, session.userConnected);
     } catch (e) {
       EglHelper.toastMessage((e.toString()));
       loading = false;
@@ -245,100 +224,75 @@ class ArticleEditController extends ChangeNotifier {
   }
 
   firstManageDates() {
-    newArticle.publicationDateArticle = newArticle.publicationDateArticle == ''
-        ? EglHelper.datetimeToAaaammdd(DateTime.now())
-        : newArticle.publicationDateArticle;
+    newArticle.publicationDateArticle =
+        newArticle.publicationDateArticle == '' ? EglHelper.datetimeToAaaammdd(DateTime.now()) : newArticle.publicationDateArticle;
 
     newArticle.effectiveDateArticle = newArticle.effectiveDateArticle == ''
         ? newArticle.publicationDateArticle
-        : newArticle.effectiveDateArticle
-                    .compareTo(newArticle.publicationDateArticle) <
-                0
+        : newArticle.effectiveDateArticle.compareTo(newArticle.publicationDateArticle) < 0
             ? newArticle.publicationDateArticle
             : newArticle.effectiveDateArticle;
 
     newArticle.expirationDateArticle = newArticle.expirationDateArticle == ''
         ? EglHelper.datetimeToAaaammdd(DateTime(4000))
-        : newArticle.expirationDateArticle
-                    .compareTo(newArticle.effectiveDateArticle) <
-                0
+        : newArticle.expirationDateArticle.compareTo(newArticle.effectiveDateArticle) < 0
             ? newArticle.effectiveDateArticle
             : newArticle.expirationDateArticle;
 
-    selectedDatePublication.value =
-        EglHelper.aaaammddToDatetime(newArticle.publicationDateArticle);
-    firstDatePublication.value = selectedDatePublication.value;
-    textDatePublication.value =
-        selectedDatePublication.value.isAtSameMomentAs(DateTime(4000))
-            ? 'dd/mm/aaaa'
-            : DateFormat('dd/MM/yyyy').format(selectedDatePublication.value);
+    selectedDatePublication = EglHelper.aaaammddToDatetime(newArticle.publicationDateArticle);
+    firstDatePublication = selectedDatePublication;
+    textDatePublication =
+        selectedDatePublication.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(selectedDatePublication);
 
-    selectedDateEffective.value =
-        EglHelper.aaaammddToDatetime(newArticle.effectiveDateArticle);
-    firstDateEffective.value = selectedDatePublication.value;
-    textDateEffective.value =
-        selectedDateEffective.value.isAtSameMomentAs(DateTime(4000))
-            ? 'dd/mm/aaaa'
-            : DateFormat('dd/MM/yyyy').format(selectedDateEffective.value);
+    selectedDateEffective = EglHelper.aaaammddToDatetime(newArticle.effectiveDateArticle);
+    firstDateEffective = selectedDatePublication;
+    textDateEffective =
+        selectedDateEffective.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(selectedDateEffective);
 
-    selectedDateExpiration.value =
-        EglHelper.aaaammddToDatetime(newArticle.expirationDateArticle);
-    firstDateExpiration.value = selectedDateEffective.value;
-    textDateExpiration.value =
-        selectedDateExpiration.value.isAtSameMomentAs(DateTime(4000))
-            ? 'dd/mm/aaaa'
-            : DateFormat('dd/MM/yyyy').format(selectedDateExpiration.value);
+    selectedDateExpiration = EglHelper.aaaammddToDatetime(newArticle.expirationDateArticle);
+    firstDateExpiration = selectedDateEffective;
+    textDateExpiration =
+        selectedDateExpiration.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(selectedDateExpiration);
   }
 
   managePublicationDate(DateTime newDate) {
-    selectedDatePublication.value = newDate;
+    selectedDatePublication = newDate;
     newArticle.publicationDateArticle = EglHelper.datetimeToAaaammdd(newDate);
-    textDatePublication.value = newDate.isAtSameMomentAs(DateTime(4000))
-        ? 'dd/mm/aaaa'
-        : DateFormat('dd/MM/yyyy').format(newDate);
+    textDatePublication = newDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(newDate);
 
-    if (newDate.isAfter(selectedDateEffective.value)) {
-      selectedDateEffective.value = newDate;
-      firstDateEffective.value = newDate;
+    if (newDate.isAfter(selectedDateEffective)) {
+      selectedDateEffective = newDate;
+      firstDateEffective = newDate;
 
       newArticle.effectiveDateArticle = EglHelper.datetimeToAaaammdd(newDate);
-      textDateEffective.value = newDate.isAtSameMomentAs(DateTime(4000))
-          ? 'dd/mm/aaaa'
-          : DateFormat('dd/MM/yyyy').format(newDate);
+      textDateEffective = newDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(newDate);
 
-      if (newDate.isAfter(selectedDateExpiration.value)) {
-        selectedDateExpiration.value = newDate;
-        firstDateExpiration.value = newDate;
-        newArticle.expirationDateArticle =
-            EglHelper.datetimeToAaaammdd(newDate);
-        textDateExpiration.value = newDate.isAtSameMomentAs(DateTime(4000))
-            ? 'dd/mm/aaaa'
-            : DateFormat('dd/MM/yyyy').format(newDate);
+      if (newDate.isAfter(selectedDateExpiration)) {
+        selectedDateExpiration = newDate;
+        firstDateExpiration = newDate;
+        newArticle.expirationDateArticle = EglHelper.datetimeToAaaammdd(newDate);
+        textDateExpiration = newDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(newDate);
       } else {
-        firstDateExpiration.value = newDate;
+        firstDateExpiration = newDate;
       }
     } else {
-      firstDateEffective.value = newDate;
-      firstDateExpiration.value = selectedDateEffective.value;
+      firstDateEffective = newDate;
+      firstDateExpiration = selectedDateEffective;
     }
   }
 
   manageEffectiveDate(DateTime newDate) {
-    selectedDateEffective.value = newDate;
+    selectedDateEffective = newDate;
     newArticle.effectiveDateArticle = EglHelper.datetimeToAaaammdd(newDate);
-    textDateEffective.value = newDate.isAtSameMomentAs(DateTime(4000))
-        ? 'dd/mm/aaaa'
-        : DateFormat('dd/MM/yyyy').format(newDate);
+    textDateEffective = newDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(newDate);
 
-    if (newDate.isAfter(selectedDateExpiration.value)) {
-      selectedDateExpiration.value = newDate;
-      firstDateExpiration.value = newDate;
+    if (newDate.isAfter(selectedDateExpiration)) {
+      selectedDateExpiration = newDate;
+      firstDateExpiration = newDate;
       newArticle.expirationDateArticle = EglHelper.datetimeToAaaammdd(newDate);
-      textDateExpiration.value = newDate.isAtSameMomentAs(DateTime(4000))
-          ? 'dd/mm/aaaa'
-          : DateFormat('dd/MM/yyyy').format(newDate);
+      textDateExpiration = newDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(newDate);
     } else {
-      firstDateExpiration.value = newDate;
+      firstDateExpiration = newDate;
     }
   }
 

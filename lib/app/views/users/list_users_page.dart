@@ -3,6 +3,7 @@ import 'package:asocapp/app/views/users/user_list_view.dart';
 import 'package:asocapp/app/widgets/bar_widgets/egl_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class ListUsersPage extends StatefulWidget {
   const ListUsersPage({super.key});
@@ -12,10 +13,10 @@ class ListUsersPage extends StatefulWidget {
 }
 
 class _ListUsersPageState extends State<ListUsersPage> {
-  final ListUsersController listUsersController = Get.put(ListUsersController());
-
   @override
   Widget build(BuildContext context) {
+    final ListUsersController listUsersController = Provider.of<ListUsersController>(context);
+
     return Scaffold(
       appBar: EglAppBar(
         showBackArrow: true,

@@ -21,8 +21,7 @@ class ProfileController extends ChangeNotifier {
   final AsociationController _asociationController;
   final UserRepository _userRepository;
 
-  ProfileController(this._context, this._session, this._asociationController,
-      this._userRepository) {
+  ProfileController(this._context, this._session, this._asociationController, this._userRepository) {
     EglHelper.eglLogger('i', '$runtimeType');
 
     refreshAsociationsList();
@@ -34,8 +33,7 @@ class ProfileController extends ChangeNotifier {
 
   final Logger logger = Logger();
 
-  GlobalKey<FormState> formKey =
-      GlobalKey<FormState>(debugLabel: '_profileController');
+  GlobalKey<FormState> formKey = GlobalKey<FormState>(debugLabel: '_profileController');
 
   final _asociationsFocusNode = FocusNode();
   FocusNode get asociationsFocusNode => _asociationsFocusNode;
@@ -131,8 +129,7 @@ class ProfileController extends ChangeNotifier {
     bool check = _isFormValid = ((formKey.currentState?.validate() ?? false) &&
         (userConnected.idAsociationUser != userConnectedLast.idAsociationUser ||
             userConnected.userNameUser != userConnectedLast.userNameUser ||
-            userConnected.timeNotificationsUser !=
-                userConnectedLast.timeNotificationsUser ||
+            userConnected.timeNotificationsUser != userConnectedLast.timeNotificationsUser ||
             (_imageAvatar == null ? false : _imageAvatar!.path != '') ||
             userConnected.languageUser != userConnectedLast.languageUser));
     notifyListeners();
@@ -157,7 +154,7 @@ class ProfileController extends ChangeNotifier {
         Navigator.pushReplacementNamed(_context, Routes.dashboardRoute);
         return false;
       }
-      userConnected = _session.userConnected!.clone();
+      userConnected = _session.userConnected.clone();
       userConnectedIni = userConnected.clone();
       userConnectedLast = userConnected.clone();
       logger.i('isLogin: ${userConnectedIni.idAsociationUser}');
@@ -194,15 +191,14 @@ class ProfileController extends ChangeNotifier {
     loading = true;
 
     try {
-      final Future<HttpResult<UserAsocResponse>?> response =
-          _userRepository.updateProfile(
+      final Future<HttpResult<UserAsocResponse>?> response = _userRepository.updateProfile(
         idUser,
         userName,
         asociationId,
         intervalNotifications,
         languageUser,
         dateUpdatedUser,
-        _session.userConnected!.tokenUser,
+        _session.userConnected.tokenUser,
       );
       loading = false;
       return response;
@@ -225,8 +221,7 @@ class ProfileController extends ChangeNotifier {
     loading = true;
 
     try {
-      final Future<HttpResult<UserAsocResponse>?> response =
-          _userRepository.updateProfileAvatar(
+      final Future<HttpResult<UserAsocResponse>?> response = _userRepository.updateProfileAvatar(
         idUser,
         userName,
         asociationId,
@@ -234,7 +229,7 @@ class ProfileController extends ChangeNotifier {
         languageUser,
         imageAvatar,
         dateUpdatedUser,
-        _session.userConnected!.tokenUser,
+        _session.userConnected.tokenUser,
       );
       loading = false;
       return response;
@@ -309,23 +304,17 @@ class ProfileController extends ChangeNotifier {
 
   pickImage(String option) async {
     final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-        source: option == 'camera' ? ImageSource.camera : ImageSource.gallery);
+    final XFile? pickedFile = await picker.pickImage(source: option == 'camera' ? ImageSource.camera : ImageSource.gallery);
     if (pickedFile != null) {
       //   selectedImagePath = File(pickedFile.path);
       selectedImagePath = pickedFile.path;
-      selectedImageSize =
-          "${(File(selectedImagePath).lengthSync() / 1024 / 1024).toStringAsFixed(2)} Mb";
+      selectedImageSize = "${(File(selectedImagePath).lengthSync() / 1024 / 1024).toStringAsFixed(2)} Mb";
 
       // Crop
-      final cropImageFile = await ImageCropper().cropImage(
-          sourcePath: selectedImagePath,
-          maxWidth: 512,
-          maxHeight: 512,
-          compressFormat: ImageCompressFormat.png);
+      final cropImageFile =
+          await ImageCropper().cropImage(sourcePath: selectedImagePath, maxWidth: 512, maxHeight: 512, compressFormat: ImageCompressFormat.png);
       cropImagePath = cropImageFile!.path;
-      cropImageSize =
-          "${(File(cropImagePath).lengthSync() / 1024 / 1024).toStringAsFixed(2)} Mb";
+      cropImageSize = "${(File(cropImagePath).lengthSync() / 1024 / 1024).toStringAsFixed(2)} Mb";
 
       // Compress
       final dir = Directory.systemTemp;
@@ -338,8 +327,7 @@ class ProfileController extends ChangeNotifier {
         format: CompressFormat.png,
       );
       compressedImagePath = compressedFile!.path;
-      compressedImageSize =
-          "${(File(compressedImagePath).lengthSync() / 1024 / 1024).toStringAsFixed(2)} Mb";
+      compressedImageSize = "${(File(compressedImagePath).lengthSync() / 1024 / 1024).toStringAsFixed(2)} Mb";
 
       // final String imageBase64 = base64Encode(imageFile.readAsBytesSync());
       EglHelper.eglLogger('i', 'isLogin: $userConnected');

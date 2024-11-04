@@ -13,6 +13,7 @@ class Routes {
   static const String loginRoute = '/login';
   static const String changeRoute = '/change';
   static const String userRoute = '/user';
+  static const String listUserRoute = '/listUser';
   static const String profileRoute = '/profile';
   static const String articleRoute = '/article';
   static const String editArticleRoute = '/editArticle';
@@ -25,7 +26,7 @@ class Routes {
             ),
         homeRoute: (context) => ChangeNotifierProvider(
               create: (context) => HomeController(context),
-              child: const DashboardPage(),
+              child: const HomePage(),
             ),
         dashboardRoute: (context) => ChangeNotifierProvider(
               create: (context) => DashboardController(context),
@@ -45,10 +46,16 @@ class Routes {
                 Provider.of<UserRepository>(context, listen: false),
               ),
               child: UserPage(
-                user: ModalRoute.of(context)!
-                    .settings
-                    .arguments as UserItem  ,
+                user: ModalRoute.of(context)!.settings.arguments as UserItem,
               ),
+            ),
+        listUserRoute: (context) => ChangeNotifierProvider(
+              create: (context) => ListUsersController(
+                context,
+                Provider.of<SessionService>(context, listen: false),
+                Provider.of<UserRepository>(context, listen: false),
+              ),
+              child: const ListUsersPage(),
             ),
         profileRoute: (context) => ChangeNotifierProvider(
               create: (context) => ProfileController(
@@ -61,24 +68,22 @@ class Routes {
             ),
         articleRoute: (context) => ChangeNotifierProvider(
               create: (context) => ArticleController(
+                context,
                 Provider.of<SessionService>(context, listen: false),
                 Provider.of<ArticlesRepository>(context, listen: false),
               ),
               child: ArticlePage(
-                articleArguments: ModalRoute.of(context)!
-                    .settings
-                    .arguments as IArticleUserArguments,
+                articleArguments: ModalRoute.of(context)!.settings.arguments as IArticleUserArguments,
               ),
             ),
         editArticleRoute: (context) => ChangeNotifierProvider(
               create: (context) => ArticleController(
+                context,
                 Provider.of<SessionService>(context, listen: false),
                 Provider.of<ArticlesRepository>(context, listen: false),
               ),
               child: EditArticlePage(
-                articleArguments: ModalRoute.of(context)!
-                    .settings
-                    .arguments as IArticleArguments ,
+                articleArguments: ModalRoute.of(context)!.settings.arguments as IArticleArguments,
               ),
             ),
         articleNotificationRoute: (context) => ChangeNotifierProvider(
@@ -87,9 +92,7 @@ class Routes {
                 Provider.of<ArticlesRepository>(context, listen: false),
               ),
               child: ArticleNotifiedPage(
-                articleNotifiedArguments: ModalRoute.of(context)!
-                    .settings
-                    .arguments as IArticleNotifiedArguments,
+                articleNotifiedArguments: ModalRoute.of(context)!.settings.arguments as IArticleNotifiedArguments,
               ),
             ),
       };

@@ -38,8 +38,7 @@ class ChangeController extends ChangeNotifier {
   UserConnected? userConnected = UserConnected.clear();
   final Logger logger = Logger();
 
-  GlobalKey<FormState> formKey =
-      GlobalKey<FormState>(debugLabel: '_changeController');
+  GlobalKey<FormState> formKey = GlobalKey<FormState>(debugLabel: '_changeController');
 
   TextEditingController passwordTextController = TextEditingController();
   TextEditingController newPasswordTextController = TextEditingController();
@@ -73,8 +72,7 @@ class ChangeController extends ChangeNotifier {
 //     return asociationController.refreshAsociationsList();
 //   }
 
-  Future<UserAsocResponse?> login(BuildContext context, String username,
-      int asociationId, String password) async {
+  Future<UserAsocResponse?> login(BuildContext context, String username, int asociationId, String password) async {
     _loading.value = true;
 
     Future<UserAsocResponse?>? userAsocData;
@@ -91,15 +89,13 @@ class ChangeController extends ChangeNotifier {
     }
   }
 
-  Future<UserAsocResponse?> change(BuildContext context, String username,
-      int asociationId, String password, String newPassword) async {
+  Future<UserAsocResponse?> change(BuildContext context, String username, int asociationId, String password, String newPassword) async {
     _loading.value = true;
 
     Future<UserAsocResponse?>? userAsocData;
 
     try {
-      userAsocData =
-          userRepository.change(username, asociationId, password, newPassword,_session.userConnected!.tokenUser);
+      userAsocData = userRepository.change(username, asociationId, password, newPassword, _session.userConnected.tokenUser);
       // logger.i(userAsocData.toString());
       _loading.value = false;
       return userAsocData;

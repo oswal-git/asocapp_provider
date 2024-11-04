@@ -1,9 +1,8 @@
 import 'package:asocapp/app/resources/resources.dart';
-import 'package:asocapp/app/routes/routes.dart';
+import 'package:asocapp/app/routes/app_router.dart';
 import 'package:asocapp/app/services/services.dart';
 import 'package:asocapp/app/translations/messages.dart';
 import 'package:asocapp/app/utils/utils.dart';
-import 'package:asocapp/app/views/views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -53,18 +52,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final session = Provider.of<SessionService>(context);
+    final session = Provider.of<SessionService>(context, listen: false);
 
     String language = 'es';
     String country = 'ES';
 
     if (session.isLogin) {
-      language = session.userConnected!.languageUser;
+      language = session.userConnected.languageUser;
       country = EglHelper.getAppCountryLocale(language);
     }
 
-    initializeDateFormatting(
-        country == '' ? language : '${language}_$country', null);
+    initializeDateFormatting(country == '' ? language : '${language}_$country', null);
     Intl.defaultLocale = country == '' ? language : '${language}_$country';
     final esES = numberFormatSymbols['es_ES'] as NumberSymbols;
     final caVL = numberFormatSymbols['ca'] as NumberSymbols;
@@ -74,9 +72,12 @@ class _MyAppState extends State<MyApp> {
     numberFormatSymbols['ca'] = caVL.copyWith(currencySymbol: r'€');
     numberFormatSymbols['en_GB'] = enGB.copyWith(currencySymbol: r'$');
 
-    return MaterialApp(
-      initialRoute: Routes.initialRoute, // Use the constant from Routes
-      routes: Routes.routes, // Use the routes map from Routes
+    return MaterialApp.router(
+      routerConfig: AppRouter.router,
+      routeInformationParser: AppRouter.router.routeInformationParser,
+      routerDelegate: AppRouter.router.routerDelegate,
+      // initialRoute: Routes.initialRoute, // Use the constant from Routes
+      // routes: Routes.routes, // Use the routes map from Routes
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -110,7 +111,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
       ),
-      home: const HomePage(),
+      // home: const HomePage(),
     );
   }
 }

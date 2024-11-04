@@ -19,8 +19,7 @@ class ArticleNotifiedController extends ChangeNotifier {
   ArticleUser get article => _article.value;
 
   Future<ArticleUser> getSingleArticle(int idarticle) async {
-    final ArticleResponse articlesResponse =
-        await articlesRepository.getSingleArticle(idarticle, token: _session.userConnected!.tokenUser);
+    final ArticleResponse articlesResponse = await articlesRepository.getSingleArticle(idarticle, token: _session.userConnected.tokenUser);
 
     // print('Response body: ${result}');
     if (articlesResponse.status == 200) {

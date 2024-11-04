@@ -20,10 +20,10 @@ extension HexColor on Color {
   }
 
   String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha.toInt().toRadixString(16).padLeft(2, '0')}'
-      '${red.toInt().toRadixString(16).padLeft(2, '0')}'
-      '${green.toInt().toRadixString(16).padLeft(2, '0')}'
-      '${blue.toInt().toRadixString(16).padLeft(2, '0')}';
+      '${a.toInt().toRadixString(16).padLeft(2, '0')}'
+      '${r.toInt().toRadixString(16).padLeft(2, '0')}'
+      '${g.toInt().toRadixString(16).padLeft(2, '0')}'
+      '${b.toInt().toRadixString(16).padLeft(2, '0')}';
 }
 
 extension StringExtensions on String {

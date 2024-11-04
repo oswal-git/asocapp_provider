@@ -20,14 +20,14 @@ class NavBar extends StatelessWidget {
           children: [
             UserAccountsDrawerHeader(
               accountName: Text(
-                ' ${session.userConnected?.userNameUser}',
+                ' ${session.userConnected.userNameUser}',
                 style: const TextStyle(
                   fontSize: 20,
                   color: AppColors.primaryTextTextColor,
                 ),
               ),
               accountEmail: Text(
-                ' ${session.userConnected?.shortNameAsoc}',
+                ' ${session.userConnected.shortNameAsoc}',
                 style: const TextStyle(
                   fontSize: 20,
                   color: AppColors.primaryTextTextColor,
@@ -41,13 +41,13 @@ class NavBar extends StatelessWidget {
                 child: CircleAvatar(
                   backgroundColor: Colors.grey,
                   foregroundColor: Colors.blue.shade900,
-                  backgroundImage: session.userConnected?.avatarUser == '' ? null : NetworkImage(session.userConnected!.avatarUser),
+                  backgroundImage: session.userConnected.avatarUser == '' ? null : NetworkImage(session.userConnected.avatarUser),
                   radius: 30,
-                  child: session.userConnected?.userNameUser == ''
+                  child: session.userConnected.userNameUser == ''
                       ? null
-                      : session.userConnected?.avatarUser == ''
+                      : session.userConnected.avatarUser == ''
                           ? Text(
-                              session.userConnected!.userNameUser.substring(0, 2).toUpperCase(),
+                              session.userConnected.userNameUser.substring(0, 2).toUpperCase(),
                               style: const TextStyle(fontSize: 30),
                             )
                           : null,
@@ -62,7 +62,7 @@ class NavBar extends StatelessWidget {
                 ),
               ),
             ),
-            if (session.userConnected?.profileUser == 'admin')
+            if (session.userConnected.profileUser == 'admin')
               ListTile(
                 leading: const Icon(Icons.person_3),
                 title: Text('cUsersList'.tr),

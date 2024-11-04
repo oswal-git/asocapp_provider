@@ -87,8 +87,7 @@ class SessionService extends ChangeNotifier {
     notifyListeners();
   }
 
-  int get toReadmessages =>
-      _listUserMessages.where((message) => message.isRead == false).length;
+  int get toReadmessages => _listUserMessages.where((message) => message.isRead == false).length;
 
   bool _checkEdit = false;
   bool get checkEdit => _checkEdit;
@@ -98,15 +97,18 @@ class SessionService extends ChangeNotifier {
   }
 
   // final _userConnected = Rx<UserConnected>(UserConnected.clear());
-  UserConnected? _userConnected;
-  UserConnected? get userConnected => _userConnected;
+  UserConnected _userConnected = UserConnected.clear();
+  UserConnected get userConnected => _userConnected;
+  set userConnected(UserConnected user) {
+    _userConnected = user;
+    notifyListeners();
+  }
 
 // Update the logged in data user in session and shared preferences
-  Future<void> updateUserConnected(UserConnected value,
-      {bool loadTask = false}) async {
+  Future<void> updateUserConnected(UserConnected value, {bool loadTask = false}) async {
     _userConnected = value;
 
-    if (userConnected!.userNameUser != '') {
+    if (userConnected.userNameUser != '') {
       // _hasData = true;
       // _isLogin = true;
 
@@ -114,14 +116,13 @@ class SessionService extends ChangeNotifier {
       // Sumar 6 horas a la hora actual
       //  Obtener el valor en segundos para hacerlo comparable con PHP
       // int tokenExpUserInSeconds = (DateTime.now().add(const Duration(hours: 6)).millisecondsSinceEpoch ~/ 1000);
-      int tokenExpUserInSeconds =
-          (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      int tokenExpUserInSeconds = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
 
-      _isExpired = (tokenExpUserInSeconds > userConnected!.tokenExpUser);
+      _isExpired = (tokenExpUserInSeconds > userConnected.tokenExpUser);
 
       await storage.writeObject(userConnectedKey, userConnected);
 
-      await registerTask(userConnected!.tokenUser, loadTask);
+      await registerTask(userConnected.tokenUser, loadTask);
       notifyListeners();
       return;
     }
@@ -130,16 +131,16 @@ class SessionService extends ChangeNotifier {
     notifyListeners();
   }
 
-  get getAuthToken => userConnected?.tokenUser;
+  get getAuthToken => userConnected.tokenUser;
 
   // authToken() async {
   //   await checkUserConnected();
-  //   return userConnected?.tokenUser;
+  //   return userConnected.tokenUser;
   // }
 
   // refreshGetAuthToken() async {
   //   bool isConnected = await checkUserConnected();
-  //   return isConnected ? userConnected?.tokenUser : '';
+  //   return isConnected ? userConnected.tokenUser : '';
   // }
 
   Future<SessionService> init() async {
@@ -152,36 +153,20 @@ class SessionService extends ChangeNotifier {
     // bool isConnected = await checkUserConnected();
 
     if (userMap.isEmpty) {
-      _userConnected ??= UserConnected.clear();
-      // _userConnected!.value = UserConnected.clear();
+      _userConnected = UserConnected.clear();
+      // _userConnected.value = UserConnected.clear();
     } else {
-      _userConnected ??= UserConnected.fromJson(userMap);
-      if (_userConnected!.userNameUser != '') {
+      _userConnected = UserConnected.fromJson(userMap);
+      if (_userConnected.userNameUser != '') {
         // _hasData = true;
         // _isLogin = true;
-        await registerTask(_userConnected!.tokenUser, true);
+        await registerTask(_userConnected.tokenUser, true);
       }
     }
     _checkEdit = false;
     notifyListeners();
     return this;
   }
-
-  // Future<bool> checkUserConnected() async {
-  //   Map<String, dynamic> userMap = storage.readObject(userConnectedKey);
-  //   bool res = false;
-
-  //   if (userMap.isEmpty) {
-  //     _userConnected ??= Rx<UserConnected>(UserConnected.clear());
-  //     // _userConnected!.value = UserConnected.clear();
-  //     res = false;
-  //   } else {
-  //     _userConnected ??= Rx<UserConnected>(UserConnected.fromJson(userMap));
-  //     // _userConnected!.value = UserConnected.fromJson(userMap);
-  //     res = true;
-  //   }
-  //   return Future.value(res);
-  // }
 
   // Initialize the logged in data user in session
   void userClear() {
@@ -195,35 +180,27 @@ class SessionService extends ChangeNotifier {
 
   Future<void> registerTask(String token, bool loadTask) async {
     if (_isLogin) {
-      EglHelper.eglLogger(
-          'i', 'Session -> loadDataUser: isLogin? ${_isLogin.toString()}');
+      EglHelper.eglLogger('i', 'Session -> loadDataUser: isLogin? ${_isLogin.toString()}');
       //   if (!isThereTask) {
       if (loadTask) {
-        EglHelper.eglLogger('i',
-            'Session -> loadDataUser: isThereTask? ${_isThereTask.toString()}');
+        EglHelper.eglLogger('i', 'Session -> loadDataUser: isThereTask? ${_isThereTask.toString()}');
         // Workmanager().cancelAll();
         _isThereTask = false;
-        if (userConnected?.timeNotificationsUser == 99) {
+        if (userConnected.timeNotificationsUser == 99) {
           Workmanager().cancelAll();
         } else {
-          final Map<String, dynamic> inputDataMap = <String, dynamic>{
-            "token": token
-          };
+          final Map<String, dynamic> inputDataMap = <String, dynamic>{"token": token};
           // final int frequency = userConnected.timeNotificationsUser * 60;  // minutes
           const int frequency = 5;
           // final int initialDelay = calcInitialDelay(userConnected.timeNotificationsUser);  // seconds
           const int initialDelay = 60;
 
           EglHelper.eglLogger('i', 'Session -> loadDataUser: token $token');
-          EglHelper.eglLogger('i',
-              'Session -> loadDataUser: inputDataMap ${inputDataMap['token']}');
-          EglHelper.eglLogger('i',
-              'Session -> loadDataUser: totokenUserken ${userConnected?.tokenUser}');
-          EglHelper.eglLogger('i',
-              'Session -> loadDataUser: timeNotificationsUser? ${userConnected?.timeNotificationsUser.toString()}');
+          EglHelper.eglLogger('i', 'Session -> loadDataUser: inputDataMap ${inputDataMap['token']}');
+          EglHelper.eglLogger('i', 'Session -> loadDataUser: totokenUserken ${userConnected.tokenUser}');
+          EglHelper.eglLogger('i', 'Session -> loadDataUser: timeNotificationsUser? ${userConnected.timeNotificationsUser.toString()}');
           _isThereTask = true;
-          EglHelper.eglLogger('i',
-              'Session -> loadDataUser: Workmanager().registerPeriodicTask');
+          EglHelper.eglLogger('i', 'Session -> loadDataUser: Workmanager().registerPeriodicTask');
 
           Workmanager().registerPeriodicTask(
             "5",
@@ -231,11 +208,8 @@ class SessionService extends ChangeNotifier {
             existingWorkPolicy: ExistingWorkPolicy.replace,
             // inputData: <String, dynamic>{"token": token},
             inputData: inputDataMap,
-            frequency: const Duration(
-                minutes: frequency), //when should it check the link
-            initialDelay: const Duration(
-                seconds:
-                    initialDelay), //duration before showing the notification
+            frequency: const Duration(minutes: frequency), //when should it check the link
+            initialDelay: const Duration(seconds: initialDelay), //duration before showing the notification
             constraints: Constraints(
               networkType: NetworkType.connected,
             ),
@@ -247,7 +221,7 @@ class SessionService extends ChangeNotifier {
                 seconds: initialDelay,
               ))));
         }
-        notifyListeners();
+        // notifyListeners();
       }
     }
   }
@@ -298,15 +272,15 @@ class SessionService extends ChangeNotifier {
 
     int secondsDifference = targetDateTime.difference(now).inSeconds;
 
-    EglHelper.eglLogger('i',
-        'Session: calcInitialDelay -> secondsDifference: $secondsDifference');
+    EglHelper.eglLogger('i', 'Session: calcInitialDelay -> secondsDifference: $secondsDifference');
     // return 4;
     return secondsDifference;
   }
 
   // Initialize the logged in data user in session and shared preferences
   Future<void> exitSession() async {
-    userClear();
+    _userConnected = UserConnected.clear();
+    _checkEdit = false;
     Workmanager().cancelAll();
     await storage.remove(userConnectedKey);
     var locale = const Locale('es', 'ES');

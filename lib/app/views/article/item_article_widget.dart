@@ -125,7 +125,7 @@ class TextItemController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    languageTo = session.userConnected!.languageUser;
+    languageTo = session.userConnected.languageUser;
   }
 
   void translate(String text) {

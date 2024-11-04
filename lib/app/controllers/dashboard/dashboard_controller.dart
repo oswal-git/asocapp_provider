@@ -7,10 +7,9 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 class DashboardController extends ChangeNotifier {
-
   final BuildContext _context;
 
-  DashboardController(this._context){
+  DashboardController(this._context) {
     isLogin();
   }
 
@@ -24,8 +23,8 @@ class DashboardController extends ChangeNotifier {
     final session = Provider.of<SessionService>(_context, listen: false);
     if (session.isLogin) {
       // Utils.eglLogger('e', 'ArticlesListView: init State isLogin');
-      if (session.userConnected?.recoverPasswordUser != 0) {
-        Timer(const Duration(seconds: 3), () => Navigator.pushReplacementNamed(_context, '/change') );
+      if (session.userConnected.recoverPasswordUser != 0) {
+        Timer(const Duration(seconds: 3), () => Navigator.pushReplacementNamed(_context, '/change'));
       } else {
         _loading.value = false;
       }

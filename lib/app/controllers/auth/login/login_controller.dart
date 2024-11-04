@@ -20,10 +20,9 @@ class LoginController extends ChangeNotifier {
 
   LoginController(this._context) {
     EglHelper.eglLogger('i', '$runtimeType');
-    
+
     session = Provider.of<SessionService>(_context, listen: false);
-    asociationController =
-        Provider.of<AsociationController>(_context, listen: false);
+    asociationController = Provider.of<AsociationController>(_context, listen: false);
     userRepository = Provider.of<UserRepository>(_context, listen: false);
 
     isLogin();
@@ -37,8 +36,7 @@ class LoginController extends ChangeNotifier {
 
   final Logger logger = Logger();
 
-  GlobalKey<FormState> formKey =
-      GlobalKey<FormState>(debugLabel: '_loginController');
+  GlobalKey<FormState> formKey = GlobalKey<FormState>(debugLabel: '_loginController');
 
   final _asociationsFocusNode = FocusNode();
   FocusNode get asociationsFocusNode => _asociationsFocusNode;
@@ -73,18 +71,16 @@ class LoginController extends ChangeNotifier {
 
   Future<void> isLogin() async {
     if (session.isLogin) {
-      if (session.userConnected?.recoverPasswordUser == 0) {
-        Timer(const Duration(seconds: 3),
-            () => Navigator.pushReplacementNamed(_context, Routes.dashboardRoute));
+      if (session.userConnected.recoverPasswordUser == 0) {
+        Timer(const Duration(seconds: 3), () => Navigator.pushReplacementNamed(_context, Routes.dashboardRoute));
       }
-      Timer(const Duration(seconds: 3), () => Navigator.pushReplacementNamed(_context, Routes.changeRoute) );
+      Timer(const Duration(seconds: 3), () => Navigator.pushReplacementNamed(_context, Routes.changeRoute));
     }
   }
 
   bool isLogged() => session.isLogin;
 
-  Future<void> updateUserConnected(UserConnected value,
-      {bool loadTask = false}) async {
+  Future<void> updateUserConnected(UserConnected value, {bool loadTask = false}) async {
     await session.updateUserConnected(
       value,
       loadTask: loadTask,
@@ -95,8 +91,7 @@ class LoginController extends ChangeNotifier {
     return asociationController.refreshAsociationsList();
   }
 
-  Future<UserAsocResponse?> login(
-      String username, int asociationId, String password) async {
+  Future<UserAsocResponse?> login(String username, int asociationId, String password) async {
     loading = true;
 
     Future<UserAsocResponse?>? userAsocData;

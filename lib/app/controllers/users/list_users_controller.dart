@@ -1,17 +1,25 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import 'package:asocapp/app/models/models.dart';
 import 'package:asocapp/app/repositorys/repositorys.dart';
 import 'package:asocapp/app/services/services.dart';
 import 'package:asocapp/app/utils/utils.dart';
-import 'package:asocapp/app/views/auth/login/login_page.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../apirest/api_models/api_models.dart';
 
-class ListUsersController extends GetxController {
-  final SessionService session = Get.put<SessionService>(SessionService());
-  final UserRepository userRepository = Get.put(UserRepository());
-  final BuildContext? _context = Get.context;
+class ListUsersController extends ChangeNotifier {
+  final SessionService _session;
+  final UserRepository _userRepository;
+  final BuildContext _context;
+
+  ListUsersController(
+    this._context,
+    this._session,
+    this._userRepository,
+  );
 
   final _users = <UserItem>[].obs;
   List<UserItem> get users => _users;
@@ -21,9 +29,7 @@ class ListUsersController extends GetxController {
   bool get loading => _loading.value;
   set loading(value) => _loading.value = value;
 
-  @override
   onInit() async {
-    super.onInit();
     await refreshUsersList();
   }
 
@@ -31,7 +37,7 @@ class ListUsersController extends GetxController {
     HttpResult<UsersListResponse>? httpResult;
 
     if (_users.isEmpty) {
-      httpResult = await userRepository.getAllUsers();
+      httpResult = await _userRepository.getAllUsers(_session.userConnected.tokenUser);
 
       if (httpResult!.data != null) {
         if (httpResult.statusCode == 200) {
@@ -52,7 +58,7 @@ class ListUsersController extends GetxController {
 
       if (httpResult.error!.data == 'Expired token') {
         EglHelper.showPopMessage(
-          _context!,
+          _context,
           'mExpiredtoken'.tr,
           'mLoginIn'.tr,
           title2: '',
@@ -65,15 +71,15 @@ class ListUsersController extends GetxController {
           edgeInsetsButton: const EdgeInsets.fromLTRB(32.0, 6.0, 32.0, 16.0),
           fontSizeButton: 40.0,
           onPressed: () {
-            session.exitSession();
-            Get.offAll(() => const LoginPage());
+            _session.exitSession();
+            Router.neglect(_context, () => _context.goNamed('login'));
             // Navigator.of(context).pop();
           },
         );
       } else {
         EglHelper.popMessage(
             //   _context!, MessageType.info, 'Actualización no realizada', 'No se han podido actualizar los datos del usuario');
-            _context!,
+            _context,
             MessageType.info,
             'mNoRefresh'.tr,
             httpResult.error?.data);

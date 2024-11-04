@@ -1,9 +1,9 @@
 import 'package:asocapp/app/controllers/article/article_edit_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class EglDatePiker extends StatelessWidget {
+class EglDatePiker extends StatefulWidget {
   const EglDatePiker({
     super.key,
     required this.onDateChanged,
@@ -71,110 +71,116 @@ class EglDatePiker extends StatelessWidget {
   final ValueChanged<DateTime> onDateChanged;
 
   @override
+  State<EglDatePiker> createState() => _EglDatePikerState();
+}
+
+class _EglDatePikerState extends State<EglDatePiker> {
+  @override
   Widget build(BuildContext context) {
-    return GetBuilder<ArticleEditController>(
-      init: ArticleEditController(),
-      initState: (_) {},
-      builder: (controller) => InputDecorator(
-        decoration: InputDecoration(
-          label: Row(mainAxisSize: MainAxisSize.min, children: [
-            if (iconLabel != null)
-              Container(
-                decoration: ronudIconBorder
-                    ? BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 2,
-                        ),
-                      )
-                    : null,
-                child: Icon(
-                  iconLabel,
-                  size: ronudIconBorder ? 16.0 : 22.0,
-                  color: Colors.black,
-                ),
-              ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: iconLabel == null ? 0.0 : 8.0,
-              ),
-              child: Text(
-                labelText,
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            )
-          ]),
-          contentPadding: EdgeInsets.only(
-            left: contentPaddingLeft,
-            right: contentPaddingRight,
-            top: contentPaddingTop,
-            bottom: contentPaddingBottom,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: BorderSide(
-              color: borderColor,
-              width: enabledBorderWidth,
-            ),
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: BorderSide(
-              color: borderColor,
-              width: borderWidth,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: borderFocusColor,
-              width: focusedBorderWidth,
-            ),
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-          helperText: '',
-          helperMaxLines: 2,
-          prefixIcon: icon == null
-              ? null
-              : IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    icon,
-                    color: Colors.blue,
-                  )), // adjust size as needed
-          errorMaxLines: 2,
-          errorStyle: const TextStyle(
-            height: 1,
-            fontSize: 11,
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: () => _selectDate(context, controller),
-                // child: Text(DateFormat('dd/MM/yyyy').format(selectedDate))),
-                child:
-                    buildDateTimePicker(selectedDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(selectedDate)),
-              ),
-            ),
-            if (canReset && selectedDate != DateTime(4000))
-              InkWell(
-                onTap: () async {
-                  onDateChanged(DateTime(4000));
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(left: 8.0),
+    return ChangeNotifierProvider<ArticleEditController>(
+      create: (context) => ArticleEditController(context),
+      child: Consumer<ArticleEditController>(
+        builder: (context, controller, child) => InputDecorator(
+          decoration: InputDecoration(
+            label: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (widget.iconLabel != null)
+                Container(
+                  decoration: widget.ronudIconBorder
+                      ? BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2,
+                          ),
+                        )
+                      : null,
                   child: Icon(
-                    Icons.cancel_outlined,
-                    color: Color.fromRGBO(224, 57, 6, 1),
+                    widget.iconLabel,
+                    size: widget.ronudIconBorder ? 16.0 : 22.0,
+                    color: Colors.black,
                   ),
                 ),
+              Padding(
+                padding: EdgeInsets.only(
+                  left: widget.iconLabel == null ? 0.0 : 8.0,
+                ),
+                child: Text(
+                  widget.labelText,
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              )
+            ]),
+            contentPadding: EdgeInsets.only(
+              left: widget.contentPaddingLeft,
+              right: widget.contentPaddingRight,
+              top: widget.contentPaddingTop,
+              bottom: widget.contentPaddingBottom,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+              borderSide: BorderSide(
+                color: widget.borderColor,
+                width: widget.enabledBorderWidth,
               ),
-          ],
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+              borderSide: BorderSide(
+                color: widget.borderColor,
+                width: widget.borderWidth,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: widget.borderFocusColor,
+                width: widget.focusedBorderWidth,
+              ),
+              borderRadius: BorderRadius.circular(widget.borderRadius),
+            ),
+            helperText: '',
+            helperMaxLines: 2,
+            prefixIcon: widget.icon == null
+                ? null
+                : IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      widget.icon,
+                      color: Colors.blue,
+                    )), // adjust size as needed
+            errorMaxLines: 2,
+            errorStyle: const TextStyle(
+              height: 1,
+              fontSize: 11,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () => _selectDate(context, controller),
+                  // child: Text(DateFormat('dd/MM/yyyy').format(selectedDate))),
+                  child: buildDateTimePicker(
+                      widget.selectedDate.isAtSameMomentAs(DateTime(4000)) ? 'dd/mm/aaaa' : DateFormat('dd/MM/yyyy').format(widget.selectedDate)),
+                ),
+              ),
+              if (widget.canReset && widget.selectedDate != DateTime(4000))
+                InkWell(
+                  onTap: () async {
+                    widget.onDateChanged(DateTime(4000));
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 8.0),
+                    child: Icon(
+                      Icons.cancel_outlined,
+                      color: Color.fromRGBO(224, 57, 6, 1),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -184,10 +190,10 @@ class EglDatePiker extends StatelessWidget {
     DateTime? pickedDate = await showDatePicker(
         context: context,
         helpText: 'Select date',
-        initialDate: selectedDate.isAtSameMomentAs(DateTime(4000)) ? firstDate : selectedDate,
-        firstDate: firstDate,
-        lastDate: lastDate,
-        locale: Locale(languageCode),
+        initialDate: widget.selectedDate.isAtSameMomentAs(DateTime(4000)) ? widget.firstDate : widget.selectedDate,
+        firstDate: widget.firstDate,
+        lastDate: widget.lastDate,
+        locale: Locale(widget.languageCode),
         currentDate: DateTime.now(),
         initialEntryMode: DatePickerEntryMode.calendar,
         initialDatePickerMode: DatePickerMode.day,
@@ -205,8 +211,8 @@ class EglDatePiker extends StatelessWidget {
           );
         });
 
-    if (pickedDate != null && pickedDate != selectedDate) {
-      onDateChanged(pickedDate);
+    if (pickedDate != null && pickedDate != widget.selectedDate) {
+      widget.onDateChanged(pickedDate);
       // onChanged(dateController.value);
     }
   }

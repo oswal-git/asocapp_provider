@@ -15,8 +15,7 @@ class UserItemController extends ChangeNotifier {
 
   UserItemController(this._session, this._userRepository);
 
-  GlobalKey<FormState> formKey =
-      GlobalKey<FormState>(debugLabel: '_profileController');
+  GlobalKey<FormState> formKey = GlobalKey<FormState>(debugLabel: '_profileController');
 
   final _profileUserFocusNode = FocusNode().obs;
   FocusNode get profileUserFocusNode => _profileUserFocusNode.value;
@@ -37,8 +36,7 @@ class UserItemController extends ChangeNotifier {
     // Helper.eglLogger('i','checkIsFormValid: ${_imageAvatar.value!.path}');
     // Helper.eglLogger('i','checkIsFormValid: ${_imageAvatar.value!.path != ''}');
     return _isFormValid.value = ((formKey.currentState?.validate() ?? false) &&
-        (userItem.value.profileUser != userItemLast.value.profileUser ||
-            userItem.value.statusUser != userItemLast.value.statusUser));
+        (userItem.value.profileUser != userItemLast.value.profileUser || userItem.value.statusUser != userItemLast.value.statusUser));
   }
 
   void onClose() {
@@ -58,8 +56,7 @@ class UserItemController extends ChangeNotifier {
       userItem.value = user.clone();
       userItemIni.value = user.clone();
       userItemLast.value = user.clone();
-      EglHelper.eglLogger(
-          'i', 'isLogin: ${userItemIni.value.idAsociationUser}');
+      EglHelper.eglLogger('i', 'isLogin: ${userItemIni.value.idAsociationUser}');
       return true;
     } catch (e) {
       rethrow;
@@ -77,15 +74,8 @@ class UserItemController extends ChangeNotifier {
     loading.value = true;
 
     try {
-      final Future<HttpResult<UserAsocResponse>?> response =
-          _userRepository.updateProfile(
-              idUser,
-              userName,
-              asociationId,
-              intervalNotifications,
-              languageUser,
-              dateUpdatedUser,
-              _session.userConnected!.tokenUser);
+      final Future<HttpResult<UserAsocResponse>?> response = _userRepository.updateProfile(
+          idUser, userName, asociationId, intervalNotifications, languageUser, dateUpdatedUser, _session.userConnected.tokenUser);
       loading.value = false;
       return response;
     } catch (e) {
@@ -95,14 +85,12 @@ class UserItemController extends ChangeNotifier {
     }
   }
 
-  Future<HttpResult<UserAsocResponse>?> updateProfileStatus(int idUser,
-      String profileUser, String statusUser, String dateUpdatedUser) async {
+  Future<HttpResult<UserAsocResponse>?> updateProfileStatus(int idUser, String profileUser, String statusUser, String dateUpdatedUser) async {
     loading.value = true;
 
     try {
       final Future<HttpResult<UserAsocResponse>?> response =
-          _userRepository.updateProfileStatus(idUser, profileUser, statusUser,
-              dateUpdatedUser, _session.userConnected!.tokenUser);
+          _userRepository.updateProfileStatus(idUser, profileUser, statusUser, dateUpdatedUser, _session.userConnected.tokenUser);
       loading.value = false;
       return response;
     } catch (e) {
